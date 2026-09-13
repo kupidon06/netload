@@ -33,3 +33,6 @@ Thumbs.db
 # Packaging secrets
 .pypirc
 *.token
+.env
+.env.*
+!.env.example

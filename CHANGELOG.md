@@ -21,6 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Convenience API: `tables`, `table_names`, `has_table`, `get_table`, `to_dict`, shortcuts
   `nodes`/`links`/`zones`/`turns`.
 - Explicit exceptions: `VisumNetError`, `VisumNetParseError`, `VisumNetEncodingError`.
-- Command-line interface `netload`: summary, `--list-tables` (with fields),
+- Command-line interface `netload`: summary, `--list-tables` (with fields), `--preview NAME [--rows N]`,
   `--export-csv/--export-json/--export-geojson`, and `--table … --to-csv/--to-json/--to-geojson`.
 - Test suite covering parsing, encoding, edge cases, CSV/JSON/GeoJSON export and WKT conversion.

@@ -22,6 +22,17 @@ def build_parser() -> argparse.ArgumentParser:
         help="List the parsed tables with their fields (columns)",
     )
     parser.add_argument(
+        "--preview",
+        metavar="NAME",
+        help="Preview a table: print its fields and the first rows",
+    )
+    parser.add_argument(
+        "--rows",
+        type=int,
+        default=5,
+        help="Number of rows shown by --preview (default: 5)",
+    )
+    parser.add_argument(
         "--export-csv",
         metavar="DIR",
         help="Export every table to CSV files inside DIR",
@@ -95,6 +106,39 @@ def _print_tables_with_fields(tables: dict) -> None:
         print(f"    fields: {fields}")
 
 
+def _preview_table(network: "Network", name: str, rows: int) -> int:
+    import pandas as pd
+
+    if name not in network:
+        print(
+            f"error: table {name!r} not found. Available: "
+            f"{', '.join(network.table_names)}",
+            file=sys.stderr,
+        )
+        return 2
+
+    df = network[name]
+    print(f"Table: {name} ({len(df)} rows x {df.shape[1]} cols)")
+    if df.shape[1]:
+        print(f"Fields: {', '.join(map(str, df.columns))}")
+    print()
+
+    if len(df) == 0:
+        print("(no rows)")
+        return 0
+
+    shown = max(1, min(rows, len(df)))
+    with pd.option_context(
+        "display.max_columns", None,
+        "display.width", 220,
+    ):
+        print(df.head(shown).to_string())
+    print()
+    if shown < len(df):
+        print(f"... ({len(df) - shown} more rows)")
+    return 0
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     args = build_parser().parse_args(argv)
 
@@ -112,6 +156,9 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     if args.table is not None:
         return _transform_single_table(network, args)
+
+    if args.preview is not None:
+        return _preview_table(network, args.preview, args.rows)
 
     if args.list_tables:
         _print_tables_with_fields(network.tables)

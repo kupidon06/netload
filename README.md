@@ -178,6 +178,13 @@ Tables and fields:
     fields: NO, NAME, CONTROLTYPE, T0PRT, ...
 ```
 
+Preview a table (fields + first 5 rows by default):
+
+```bash
+netload model.net --preview NODE
+netload model.net --preview NODE --rows 10
+```
+
 Export everything:
 
 ```bash
