@@ -151,15 +151,29 @@ def _build_dataframe(table: _ParsedTable, infer_types: bool) -> pd.DataFrame:
     return df
 
 
+# Minimum fraction of non-empty values that must parse as numbers for a
+# column to be converted to a numeric dtype by the "smart" type inference.
+_NUMERIC_THRESHOLD = 0.6
+
+
 def _infer_series(series: pd.Series) -> pd.Series:
-    """Lightweight numeric inference that never corrupts text values."""
+    """Convert numeric columns, keep text columns untouched.
+
+    A column is converted when at least ``_NUMERIC_THRESHOLD`` of its
+    non-empty, non-blank values parse as numbers; non-numeric cells then
+    become ``NaN``. Empty/blank cells are treated as missing values. Columns
+    that are mostly text are left as-is, so names and identifiers are never
+    corrupted.
+    """
     if series.empty:
         return series
-    non_empty = series.dropna()
-    if len(non_empty) == 0:
+    present = series.notna() & series.astype(str).str.strip().ne("")
+    n_present = int(present.sum())
+    if n_present == 0:
         return series
     converted = pd.to_numeric(series, errors="coerce")
-    if converted.notna().sum() == len(non_empty):
+    parsed = converted[present].notna().sum()
+    if parsed / n_present >= _NUMERIC_THRESHOLD:
         return converted
     return series
 

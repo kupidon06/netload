@@ -86,6 +86,27 @@ def test_infer_types_numeric(sample_net):
     assert pd.api.types.is_string_dtype(network.nodes["NAME"])
 
 
+def test_infer_types_coerces_partially_numeric_column(tmp_path):
+    file = tmp_path / "mix.net"
+    file.write_text(
+        "$T:NO;NAME;LINKNO\n"
+        "1;Centre;10\n"
+        "2;;\n"
+        "3;Nord;30\n"
+        "4;Sud;40\n"
+        "5;;50\n",
+        encoding="utf-8",
+    )
+    network = read_net(str(file), infer_types=True)
+    t = network["T"]
+    # LINKNO: 4/5 non-empty values numeric -> coerced (blanks become NaN)
+    assert t["LINKNO"].dtype.kind == "f"
+    assert pd.isna(t["LINKNO"].iloc[1])
+    # NAME: mostly text -> kept as strings, empty stays a string
+    assert pd.api.types.is_string_dtype(t["NAME"])
+    assert t["NAME"].iloc[1] == ""
+
+
 def test_cp1251_encoding_detected(cp1251_net):
     network = read_net(cp1251_net)
     assert network.encoding == "cp1251"

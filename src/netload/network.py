@@ -66,6 +66,20 @@ class Network:
     def __len__(self) -> int:
         return len(self._tables)
 
+    def __getattr__(self, name: str) -> pd.DataFrame:
+        """Access any table by name as an attribute.
+
+        Examples: ``network.STOP``, ``network.LINK``, ``network.LINEROUTE``.
+
+        This is only called when the attribute is not found normally, so the
+        regular attributes and the ``nodes``/``links``/``zones``/``turns``
+        shortcuts keep their meaning.
+        """
+        table = self._tables.get(name)
+        if table is not None:
+            return table.df
+        raise AttributeError(f"'Network' object has no attribute {name!r}")
+
     # -- shortcuts ----------------------------------------------------------
 
     @property

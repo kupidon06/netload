@@ -11,7 +11,7 @@ from .network import Network
 from .parser import parse_net, parse_net_with_encoding
 from .table import Table
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 __all__ = [
     "Network",
