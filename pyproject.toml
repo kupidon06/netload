@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "netload"
-version = "0.1.0"
+version = "0.1.1"
 description = "A lightweight Python parser for .net network files (PTV Visum / Simetra), with CSV, JSON and GeoJSON export."
 readme = "README.md"
 requires-python = ">=3.10"
